@@ -64,14 +64,11 @@ export default class CreatePDF extends NavigationMixin(LightningElement) {
         });
 
 
-        if (this.docData.length > 1) {
-            for (let i = 1; i < this.docData.length; i++) {
-                tempBytes = Uint8Array.from(atob(this.docData[i]), (c) => c.charCodeAt(0));
-                console.log('tempBtes>> ', tempBytes)
+        const usConstitutionPdf = await PDFLib.PDFDocument.load(tempBytes);
+        console.log('After123 ', usConstitutionPdf.getPages().length)
+            for(let j =0; j<usConstitutionPdf.getPages().length; j++){
                 page = pdfDoc.addPage();
-                const usConstitutionPdf = await PDFLib.PDFDocument.load(tempBytes);
-                console.log('After ', usConstitutionPdf, usConstitutionPdf.getPages())
-                const preamble = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
+                const preamble = await pdfDoc.embedPage(usConstitutionPdf.getPages()[j]);
                 console.log(' Inside page is ', page)
 
                 const preambleDims = preamble.scale(0.95);
@@ -82,8 +79,10 @@ export default class CreatePDF extends NavigationMixin(LightningElement) {
                     y: page.getHeight() - americanFlagDims.height - 10,
                 });
             }
-
+            
         }
+
+    }
         const pdfBytes = await pdfDoc.save();
         this.saveByteArray("My PDF", pdfBytes);
     }
